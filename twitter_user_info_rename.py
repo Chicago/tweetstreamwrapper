@@ -1,0 +1,1 @@
+user_info = {'username': ENTER USERNAME HERE, 'password': ENTER PASSWORD HERE}
