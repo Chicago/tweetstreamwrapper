@@ -1,0 +1,8 @@
+bin
+include
+local
+socketpool
+*.pyc
+lib
+restkit
+twitter_user_info.py
