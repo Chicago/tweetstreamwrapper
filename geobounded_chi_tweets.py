@@ -10,10 +10,6 @@ db = server.get_db('chicago_tweets')
 
 # things to track
 locations = ["-87.96,41.644", "-87.40,42.04"]
-
-def get_last_tweet_id():
-    id = db.view('summary/all_ids', descending=True).first()
-    return id['id']
 	
 def start_stream():
     try:        

@@ -1,0 +1,16 @@
+Get all the Chicago tweetz and put them in a couch (for now)
+
+requirements:
+Python 2.7+
+virtuanenv
+pip install couchdbkit
+pip install tweetstream
+(or just run pip install -r requirements.txt)
+
+setup:
+clone, run pip installs
+rename "twitter_user_info_rename.py" to "twitter_user_info.py"
+update twitter_user_info.py to reflect your twitter username, password
+
+usage:
+python geobounded_chi_tweets.py
