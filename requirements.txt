@@ -1,3 +1,2 @@
 tweetstream
 pymongo
-pymongo
