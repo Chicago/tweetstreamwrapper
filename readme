@@ -1,17 +1,18 @@
-Get all the Chicago tweetz and put them in a couch (for now)
+Get all the Chicago tweetz and put them in a mongodb
 
 requirements:
 Python 2.7+
 virtuanenv
-source bin/activate
 pip install couchdbkit
 pip install tweetstream
 (or just run pip install -r requirements.txt)
 
 setup:
+run virtualenv command on directory (first time only)
+source bin/activate
 clone, run pip installs
 rename "twitter_user_info_rename.py" to "twitter_user_info.py"
-update twitter_user_info.py to reflect your twitter username, password
+update twitter_user_info.py to reflect your twitter username, password, & mongo data
 
 usage:
 python geobounded_chi_tweets.py

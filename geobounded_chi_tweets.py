@@ -1,41 +1,29 @@
-from tweetstream import FilterStream
-from tweetstream import ConnectionError, AuthenticationError, SampleStream
-from couchdbkit import *
-
+import pymongo
+from pymongo import Connection
+from tweetstream import FilterStream, ConnectionError, AuthenticationError, SampleStream
+from tweetils import map_tweet_fields
 from twitter_user_info import user_info
-from tweetils import get_intersection
 
-#couchdb init
-server = Server(uri='http://geopher.net:5984')
-db = server.get_db('chicago_001')
+#open connection to mongo
+connection = Connection(user_info['mongo_server'], user_info['mongo_port'])
+db = connection.ops
+db.authenticate(user_info['mongo_user'], user_info['mongo_password'])
 
 # things to track
 locations = ["-87.96,41.644", "-87.40,42.04"]
 
-# filter out all but these fields
-white_list = {'id': None, 
-              'user': {'id': ''},
-              'created_at': None,
-              'entities': None,
-              'geo': None,
-              'place': None,
-              'retweet_count': None,
-              'text': None}
-
 def start_stream():
     try:        
-		with FilterStream(user_info['username'], user_info['password'], locations=locations) as stream:
-			for tweet in stream:
-				filtered_tweet = get_intersection(dict(tweet), white_list)
-				print "Got tweet %s from %-16s\t( tweet %d, rate %.1f tweets/sec)" % \
-					(tweet["id_str"], tweet["user"]["screen_name"], stream.count, stream.rate ) 
-				db[tweet["id_str"]] = filtered_tweet
+        with FilterStream(user_info['username'], user_info['password'], locations=locations) as stream:
+            for tweet in stream:
+	            print "Got tweet %s from %-16s\t( tweet %d, rate %.1f tweets/sec)" % \
+									(tweet["id_str"], tweet["user"]["screen_name"], stream.count, stream.rate )
+	            filtered_tweet = map_tweet_fields(dict(tweet))
+	            if filtered_tweet != None:
+		            db.twitter_test.insert(filtered_tweet)
     except KeyError, e:
 		print "KeyError: ", e
 		start_stream()
-    except ResourceConflict, e:
-		print "ResourceConflict: ", e
-		start_stream()				
     except ConnectionError, e:
 		print "Disconnected from twitter. Reason:", e.reason
         

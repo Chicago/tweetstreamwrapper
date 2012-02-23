@@ -1,27 +1,33 @@
 import unittest
-from tweetils import get_intersection
+import json
+from tweetils import map_tweet_fields
 
 class TestSequenceFunctions(unittest.TestCase):
 	                
     def setUp(self):
-        # mock tweet dict with id, id_str, and user fields
-        # user field has two nested subfields; id and profile_text_color
-        self.tweet = {'id': 167978744684883968, 
-                      'id_str': "167978744684883968", 
-                      'user': {'id': "196784134", "profile_text_color": "333333"}}
+        # load a sample tweet into memory to test with
+        tweet = open('testdata/test_tweet.json', 'r').read()
+        self.test_tweet = json.loads(tweet)
 
-        # white_list (filter list) specifies that we want ALL information for id
-        # that is, even if id has nested fields we will take them all
-        # the filter also says that we want data from the user field but ONLY
-        # the id nested field (so, the above mock object's profile_test_color should be
-        # ignored)
-        self.white_list = {'id': None, 'user': {'id': ''}}
-
-    def test_union_filter_should_return_only_id_and_user_id(self):
-        self.assertEqual('id' in self.tweet, True)
-        expected = {'id': 167978744684883968, 
-                    'user': {'id': '196784134'}}
-        self.assertEqual(expected, get_intersection(self.tweet, self.white_list))
+    def test_that_map_tweet_fields_proccesses_tweet(self):
+        response = map_tweet_fields(self.test_tweet)
+        self.assertEqual('ObjectId("170009469021982720")', response["id"])
+        self.assertEqual(-89.82472222, response["shard"])
+        what = response['what']
+        self.assertEqual('talk about the weather', what["text"])
+        self.assertEqual(23, what["retweet_count"])
+        self.assertEqual(21, what["followers_count"])
+        self.assertEqual("unsuccess", what["hashtags"][0]["text"])
+        where = response['where']
+        self.assertEqual(40.0075, where["location"][0])
+        self.assertEqual(-89.82472222, where["location"][1])
+        self.assertEqual(1329368390, response["when"]["date"])
+        who = response['who']
+        self.assertEqual(165964121, who["id"])
+        self.assertEqual("WoodlandLakesWS", who["screen_name"])
+        self.assertEqual("Weather Conditions...", who["description"])
+        self.assertEqual("Petersburg, IL USA", who["location"])
+        self.assertEqual("TWEET", response["type"])
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
