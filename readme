@@ -3,16 +3,46 @@ Get all the Chicago tweetz and put them in a mongodb
 requirements:
 Python 2.7+
 virtuanenv
-pip install couchdbkit
-pip install tweetstream
-(or just run pip install -r requirements.txt)
 
 setup:
 run virtualenv command on directory (first time only)
 source bin/activate
-clone, run pip installs
+run pip install -r requirements.txt
 rename "twitter_user_info_rename.py" to "twitter_user_info.py"
-update twitter_user_info.py to reflect your twitter username, password, & mongo data
+
+set twitter_user_info.py values for your environment:
+
+username = twitter basic auth username
+password = twiter basic auth password
+mongo_server = mongo server host id or ip
+mongo_port = port for mongo_server
+mongo_user = user id for mongo_server
+mongo_password = password for mongo_user
+locations = list of bounding box lon,lat pairs (see explanation below)
+tag = custom, static tag that will be saved in each tweet document in mongo
+
+example twitter_user_info file:
+
+user_info = {'username': 'joe', 
+             'password': 'secretofjoe',
+             'mongo_server': '127.0.0.1',
+             'mongo_port': 27017,
+             'mongo_user': 'mongou',
+             'mongo_password': 's3cr3t',
+             'locations': ["-87.96,41.644", "-87.40,42.04"],
+             'tag': "Chicago"}
+
+a word about locations setting:
+
+locations should be entered as per the twitter bounding box guidelines: https://dev.twitter.com/docs/streaming-api/methods#locations 
+In the example above, a single bounding box is defined in the Chicago area with the lower left point of the
+box defined as "-87.96,41.644" and the upper right defined as "-87.40,42.04". To enter additional boxes,
+simply add lowerleft and upperright pairs to the list. For example:
+
+'locations': ["-122.75,36.8","-121.75,37.8","-74,40","-73,41"]
+
+defines bounding boxes over San Francisco, CA and New York, NY.
+
 
 usage:
 python geobounded_chi_tweets.py

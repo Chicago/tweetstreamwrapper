@@ -1,6 +1,15 @@
 import unittest
 import json
-from tweetils import map_tweet_fields
+from tweetils import Tweetils
+
+class MockDatabaseManager(object):
+
+    def __init__(self):
+        pass
+
+    def insert(self, document):
+        #mock object no op
+        pass
 
 class TestSequenceFunctions(unittest.TestCase):
 	                
@@ -8,9 +17,12 @@ class TestSequenceFunctions(unittest.TestCase):
         # load a sample tweet into memory to test with
         tweet = open('testdata/test_tweet.json', 'r').read()
         self.test_tweet = json.loads(tweet)
+        mock_db_manager = MockDatabaseManager()
+        mock_configuration = { "tag": "Chicago" }
+        self.tweetils = Tweetils(mock_db_manager, mock_configuration)
 
     def test_that_map_tweet_fields_proccesses_tweet(self):
-        response = map_tweet_fields(self.test_tweet)
+        response = self.tweetils.map_tweet_fields(self.test_tweet)
         self.assertEqual('ObjectId("170009469021982720")', response["id"])
         self.assertEqual(-89.82472222, response["shard"])
         what = response['what']
@@ -18,6 +30,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(23, what["retweet_count"])
         self.assertEqual(21, what["followers_count"])
         self.assertEqual("unsuccess", what["hashtags"][0]["text"])
+        self.assertEqual("Chicago", what["tag"])
         where = response['where']
         self.assertEqual(40.0075, where["location"][0])
         self.assertEqual(-89.82472222, where["location"][1])
@@ -32,4 +45,3 @@ class TestSequenceFunctions(unittest.TestCase):
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
 	unittest.TextTestRunner(verbosity=2).run(suite)
-	
