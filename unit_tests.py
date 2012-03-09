@@ -19,7 +19,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.test_tweet = json.loads(tweet)
         mock_db_manager = MockDatabaseManager()
         mock_configuration = { "tag": "Chicago" }
-        self.tweetils = Tweetils(mock_db_manager, mock_configuration)
+        self.tweetils = Tweetils(mock_db_manager, None, mock_configuration)
 
     def test_that_map_tweet_fields_proccesses_tweet(self):
         response = self.tweetils.map_tweet_fields(self.test_tweet)

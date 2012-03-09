@@ -1,14 +1,13 @@
 import calendar
 import time
-import pymongo
-from pymongo import Connection
 from tweetstream import FilterStream, ConnectionError, AuthenticationError, SampleStream
 
 class Tweetils(object):
 
-    def __init__(self, database_manager, configuration_list):
+    def __init__(self, database_manager, publisher, configuration_list):
         self.db = database_manager
         self.user_info = configuration_list
+        self.publisher = publisher
 
     def start_stream(self):
         try:
@@ -17,10 +16,13 @@ class Tweetils(object):
                               locations=self.user_info["locations"]) as stream:
                 for tweet in stream:
                     print "Got tweet %s from %-16s\t( tweet %d, rate %.1f tweets/sec)" % \
-                        (tweet["id_str"], tweet["user"]["screen_name"], stream.count, stream.rate)
+                        (tweet["id_str"], tweet["user"]["screen_name"], \
+                        stream.count, stream.rate)
                     filtered_tweet = self.map_tweet_fields(dict(tweet))
                     if filtered_tweet != None:
                             self.db.insert(filtered_tweet)
+                            if self.publisher != None:
+                                self.publisher.publish(filtered_tweet)
         except KeyError, e:
             print "KeyError: ", e
             self.start_stream()
@@ -60,14 +62,3 @@ class Tweetils(object):
 	response["type"] = "TWEET"
 	
 	return response
-
-class DatabaseManager(object):
-
-    def __init__(self, configuration_list):
-        connection = Connection(configuration_list['mongo_server'], configuration_list['mongo_port'])
-        self.db = connection.ops
-        self.db.authenticate(configuration_list['mongo_user'], configuration_list['mongo_password'])
-
-    def insert(self, document):
-        self.db.twitter_test.insert(document)
-
