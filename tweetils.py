@@ -20,7 +20,8 @@ class Tweetils(object):
                         stream.count, stream.rate)
                     filtered_tweet = self.map_tweet_fields(dict(tweet))
                     if filtered_tweet != None:
-                            self.db.insert(filtered_tweet)
+                            if self.db != None:
+                                self.db.insert(filtered_tweet)
                             if self.publisher != None:
                                 self.publisher.publish(filtered_tweet)
         except KeyError, e:
