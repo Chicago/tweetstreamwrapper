@@ -1,4 +1,5 @@
 import calendar
+import json
 import time
 from tweetstream import FilterStream, ConnectionError, AuthenticationError, SampleStream
 
@@ -23,7 +24,7 @@ class Tweetils(object):
                             if self.db != None:
                                 self.db.insert(filtered_tweet)
                             if self.publisher != None:
-                                self.publisher.publish(filtered_tweet)
+                                self.publisher.publish(json.dumps(filtered_tweet))
         except KeyError, e:
             print "KeyError: ", e
             self.start_stream()
@@ -44,22 +45,24 @@ class Tweetils(object):
 	
         # build response dict based on custom mongo/sharding scheme for City of Chi	
         response = {}
-	response["id"] = str('ObjectId("' + json_object['id_str'] + '")')
-	response["shard"] = json_object['coordinates']['coordinates'][0]
-	response["what"] = {"text": json_object['text'],
-                            "tag": self.user_info["tag"],
-	                    "retweet_count": json_object['retweet_count'],
-	                    "followers_count": json_object['user']['followers_count'],
-	                    "hashtags": json_object['entities']['hashtags']}
+	response['_id'] = json_object['id_str'] 
+	response['shard'] = json_object['coordinates']['coordinates'][0]
+	response['what'] = {'text': json_object['text'],
+                            'tag': self.user_info['tag'],
+	                    'retweet_count': json_object['retweet_count'],
+	                    'followers_count': json_object['user']['followers_count'],
+	                    'hashtags': json_object['entities']['hashtags']}
 	lat = json_object['coordinates']['coordinates'][1]
 	lon = json_object['coordinates']['coordinates'][0]
-	response["where"] = {"location": [lat, lon]}
-	timestamp = time.strptime(json_object['created_at'], "%a %b %d %H:%M:%S +0000 %Y")
-	response["when"] = {"date": calendar.timegm(timestamp)}
-	response["who"] = {"id": json_object['user']['id'], 
-	                   "screen_name": json_object['user']['screen_name'],
-	                   "description": json_object['user']['description'],
-	                   "location": json_object['user']['location']}
-	response["type"] = "TWEET"
+	response['where'] = {'location': [lat, lon]}
+	timestamp = time.strptime(json_object['created_at'], 
+                                      '%a %b %d %H:%M:%S +0000 %Y')
+	response['when'] = {'date': calendar.timegm(timestamp), 
+                            'shardtime': calendar.timegm(timestamp)}
+	response['who'] = {'id': json_object['user']['id'], 
+	                   'screen_name': str(json_object['user']['screen_name']),
+	                   'description': json_object['user']['description'],
+	                   'location': json_object['user']['location']}
+	response['type'] = 'TWEET'
 	
-	return response
+        return response
