@@ -1,2 +1,3 @@
 tweetstream
 pymongo
+whoosh
