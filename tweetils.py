@@ -1,6 +1,9 @@
 import calendar
 import json
 import time
+from whoosh.analysis import RegexTokenizer
+from whoosh.analysis import LowercaseFilter
+from whoosh.analysis import StopFilter
 from tweetstream import FilterStream, ConnectionError, AuthenticationError, SampleStream
 
 class Tweetils(object):
@@ -9,6 +12,7 @@ class Tweetils(object):
         self.db = database_manager
         self.user_info = configuration_list
         self.publisher = publisher
+        self.filter = RegexTokenizer() | LowercaseFilter() | StopFilter()
 
     def start_stream(self):
         try:
@@ -47,7 +51,9 @@ class Tweetils(object):
         response = {}
 	response['_id'] = json_object['id_str'] 
 	response['shard'] = json_object['coordinates']['coordinates'][0]
+        tokens = [token.text for token in self.filter(json_object['text'])]
 	response['what'] = {'text': json_object['text'],
+                            'tokens': tokens,
                             'tag': self.user_info['tag'],
 	                    'retweet_count': json_object['retweet_count'],
 	                    'followers_count': json_object['user']['followers_count'],
@@ -60,7 +66,7 @@ class Tweetils(object):
 	response['when'] = {'date': calendar.timegm(timestamp), 
                             'shardtime': calendar.timegm(timestamp)}
 	response['who'] = {'id': json_object['user']['id'], 
-	                   'screen_name': str(json_object['user']['screen_name']),
+	                   'screen_name': json_object['user']['screen_name'],
 	                   'description': json_object['user']['description'],
 	                   'location': json_object['user']['location']}
 	response['type'] = 'TWEET'
