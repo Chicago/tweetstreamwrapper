@@ -60,7 +60,9 @@ class Tweetils(object):
 	                    'hashtags': json_object['entities']['hashtags']}
 	lat = json_object['coordinates']['coordinates'][1]
 	lon = json_object['coordinates']['coordinates'][0]
-	response['where'] = {'location': [lat, lon]}
+	response['where'] = {'location': [lat, lon],
+                             "latitude" : lat, 
+                             "longitude" : lon}
 	timestamp = time.strptime(json_object['created_at'], 
                                       '%a %b %d %H:%M:%S +0000 %Y')
 	response['when'] = {'date': calendar.timegm(timestamp), 
