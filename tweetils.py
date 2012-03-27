@@ -1,6 +1,8 @@
 import calendar
 import json
+import re
 import time
+from time import gmtime, strftime
 from whoosh.analysis import RegexTokenizer
 from whoosh.analysis import LowercaseFilter
 from whoosh.analysis import StopFilter
@@ -20,11 +22,12 @@ class Tweetils(object):
                               self.user_info["password"], 
                               locations=self.user_info["locations"]) as stream:
                 for tweet in stream:
-                    print "Got tweet %s from %-16s\t( tweet %d, rate %.1f tweets/sec)" % \
-                        (tweet["id_str"], tweet["user"]["screen_name"], \
+                    print "%s Got tweet %s from %-16s\t( tweet %d, rate %.1f tweets/sec)" % \
+                        (strftime("%Y%m%d %H:%M:%S +0000: ", gmtime()), tweet["id_str"], tweet["user"]["screen_name"], \
                         stream.count, stream.rate)
                     filtered_tweet = self.map_tweet_fields(dict(tweet))
                     if filtered_tweet != None:
+                            print "attempting db insert and publish for {0}".format(tweet["id_str"])
                             if self.db != None:
                                 self.db.insert(filtered_tweet)
                             if self.publisher != None:
@@ -51,9 +54,11 @@ class Tweetils(object):
         response = {}
 	response['_id'] = json_object['id_str'] 
 	response['shard'] = json_object['coordinates']['coordinates'][0]
-        tokens = [token.text for token in self.filter(json_object['text'])]
+        (stripped_text, link_array) = self.strip_links(json_object['text'])
+        tokens = [token.text for token in self.filter(stripped_text)]
 	response['what'] = {'text': json_object['text'],
                             'tokens': tokens,
+                            'link_array': link_array,
                             'tag': self.user_info['tag'],
 	                    'retweet_count': json_object['retweet_count'],
 	                    'followers_count': json_object['user']['followers_count'],
@@ -74,3 +79,10 @@ class Tweetils(object):
 	response['type'] = 'TWEET'
 	
         return response
+
+    def strip_links(self, status):
+        links = re.findall(r'(https?://\S+)', status)
+        for url in links:
+            status = status.replace(url, '')
+        return (status, links)
+

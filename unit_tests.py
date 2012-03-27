@@ -23,10 +23,11 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_that_map_tweet_fields_proccesses_tweet(self):
         response = self.tweetils.map_tweet_fields(self.test_tweet)
-        self.assertEqual('ObjectId("170009469021982720")', response["id"])
+        self.assertEqual('170009469021982720', response["_id"])
         self.assertEqual(-89.82472222, response["shard"])
         what = response['what']
-        self.assertEqual('talk about the weather', what["text"])
+        self.assertEqual('talk about the weather ', what["text"])
+        self.assertEqual(['http://www.weather.com/test'], what["link_array"])
         self.assertEqual(23, what["retweet_count"])
         self.assertEqual(21, what["followers_count"])
         self.assertEqual("unsuccess", what["hashtags"][0]["text"])
@@ -41,6 +42,16 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual("Weather Conditions...", who["description"])
         self.assertEqual("Petersburg, IL USA", who["location"])
         self.assertEqual("TWEET", response["type"])
+
+    def test_that_strip_links_removes_uris(self):
+        test_string = "check out my tweet http://t.co/NOZtxyAa #WAT!" \
+            "https://chitown.gov/totally_fake.php/page$99~"
+        expected_string = "check out my tweet  #WAT!"
+        expected_array = ["http://t.co/NOZtxyAa", 
+            "https://chitown.gov/totally_fake.php/page$99~"]
+        (stripped_string, link_array) = self.tweetils.strip_links(test_string)
+        self.assertEqual(stripped_string, expected_string)
+        self.assertEqual(link_array, expected_array)
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
