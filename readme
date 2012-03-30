@@ -32,7 +32,7 @@ user_info = {'username': 'joe',
              'locations': ["-87.96,41.644", "-87.40,42.04"],
              'tag': "Chicago"}
 
-a word about locations setting:
+some words about locations setting:
 
 locations should be entered as per the twitter bounding box guidelines: https://dev.twitter.com/docs/streaming-api/methods#locations 
 In the example above, a single bounding box is defined in the Chicago area with the lower left point of the
