@@ -3,6 +3,7 @@ include
 local
 socketpool
 *.pyc
+*.swp
 lib
 restkit
 twitter_user_info.py

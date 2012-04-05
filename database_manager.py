@@ -33,9 +33,12 @@ class DatabaseManager(object):
             self.connect()
             return
         try:
-            self.db.twitter_test.insert(document, safe=True)
+            self.db.windygrid.insert(document, safe=True)
+        except DuplicateKeyError, dke:
+            print "It appears twitter sent the same message twice, ignoring it!"
+            print "Details of DuplicateKeyError:", dke
         except (IOError, OperationFailure), e:
-            print "DatabaseManger Socket Error: ", e
+            print "DatabaseManger Error: ", e
             self.active = False
 
     def _empty_queue(self):
@@ -43,7 +46,7 @@ class DatabaseManager(object):
             return
         for document in self.message_queue:
             print "inserting queued document with id {0}".format(document["_id"])
-            self.db.twitter_test.insert(document, safe=True)
+            self.db.windygrid.insert(document, safe=True)
         self.message_queue.clear()
         print "DatabaseManager queue has been cleared - all messages written to mongodb"
 

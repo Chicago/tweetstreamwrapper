@@ -1,6 +1,8 @@
 import unittest
 import json
+from database_manager import *
 from tweetils import Tweetils
+from twitter_user_info import user_info
 
 class MockDatabaseManager(object):
 
@@ -26,7 +28,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual('170009469021982720', response["_id"])
         self.assertEqual(-89.82472222, response["shard"])
         what = response['what']
-        self.assertEqual('talk about the weather ', what["text"])
+        self.assertEqual('talk about the weather http://www.weather.com/test', what["text"])
         self.assertEqual(['http://www.weather.com/test'], what["link_array"])
         self.assertEqual(23, what["retweet_count"])
         self.assertEqual(21, what["followers_count"])
@@ -52,6 +54,13 @@ class TestSequenceFunctions(unittest.TestCase):
         (stripped_string, link_array) = self.tweetils.strip_links(test_string)
         self.assertEqual(stripped_string, expected_string)
         self.assertEqual(link_array, expected_array)
+
+    def test_that_DBManage_handles_mongo_unique_index_error(self):
+        database_manager = DatabaseManager(user_info)
+        tweet = self.tweetils.map_tweet_fields(self.test_tweet)
+        database_manager.insert(tweet)
+        database_manager.insert(tweet)
+  
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
