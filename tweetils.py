@@ -76,7 +76,7 @@ class Tweetils(object):
 	                   'screen_name': json_object['user']['screen_name'],
 	                   'description': json_object['user']['description'],
 	                   'location': json_object['user']['location']}
-	response['type'] = 'TWEET'
+	response['type'] = 'tweet'
 	
         return response
 

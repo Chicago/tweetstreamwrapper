@@ -43,7 +43,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual("WoodlandLakesWS", who["screen_name"])
         self.assertEqual("Weather Conditions...", who["description"])
         self.assertEqual("Petersburg, IL USA", who["location"])
-        self.assertEqual("TWEET", response["type"])
+        self.assertEqual("tweet", response["type"])
 
     def test_that_strip_links_removes_uris(self):
         test_string = "check out my tweet http://t.co/NOZtxyAa #WAT!" \
