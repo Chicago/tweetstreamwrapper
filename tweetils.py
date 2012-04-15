@@ -10,11 +10,14 @@ from tweetstream import FilterStream, ConnectionError, AuthenticationError, Samp
 
 class Tweetils(object):
 
-    def __init__(self, database_manager, publisher, configuration_list):
+    def __init__(self, database_manager, publisher, configuration_list, stop_words):
         self.db = database_manager
         self.user_info = configuration_list
         self.publisher = publisher
-        self.filter = RegexTokenizer() | LowercaseFilter() | StopFilter()
+        self.filter = RegexTokenizer() | \
+           LowercaseFilter() | \
+           StopFilter() | \
+           StopFilter(stop_words)
 
     def start_stream(self):
         try:
@@ -70,8 +73,8 @@ class Tweetils(object):
                              "longitude" : lon}
 	timestamp = time.strptime(json_object['created_at'], 
                                       '%a %b %d %H:%M:%S +0000 %Y')
-	response['when'] = {'date': calendar.timegm(timestamp), 
-                            'shardtime': calendar.timegm(timestamp)}
+	response['when'] = {'date': 'NumberLong("' + str(calendar.timegm(timestamp)) + '")', 
+                        'shardtime': 'NumberLong("' + str(calendar.timegm(timestamp)) + '")' }
 	response['who'] = {'id': json_object['user']['id'], 
 	                   'screen_name': json_object['user']['screen_name'],
 	                   'description': json_object['user']['description'],

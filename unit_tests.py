@@ -21,7 +21,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.test_tweet = json.loads(tweet)
         mock_db_manager = MockDatabaseManager()
         mock_configuration = { "tag": "Chicago" }
-        self.tweetils = Tweetils(mock_db_manager, None, mock_configuration)
+        mock_stop_words = ['is', 'a']
+        self.tweetils = Tweetils(mock_db_manager, None, mock_configuration,
+            mock_stop_words)
 
     def test_that_map_tweet_fields_proccesses_tweet(self):
         response = self.tweetils.map_tweet_fields(self.test_tweet)
@@ -33,11 +35,13 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(23, what["retweet_count"])
         self.assertEqual(21, what["followers_count"])
         self.assertEqual("unsuccess", what["hashtags"][0]["text"])
+        self.assertEqual([ "talk", "about", "weather" ], what['tokens'])
         self.assertEqual("Chicago", what["tag"])
         where = response['where']
         self.assertEqual(40.0075, where["location"][0])
         self.assertEqual(-89.82472222, where["location"][1])
-        self.assertEqual(1329368390, response["when"]["date"])
+        self.assertEqual('NumberLong("1329368390")', response["when"]["shardtime"])
+        self.assertEqual('NumberLong("1329368390")', response["when"]["date"])
         who = response['who']
         self.assertEqual(165964121, who["id"])
         self.assertEqual("WoodlandLakesWS", who["screen_name"])
