@@ -2,6 +2,8 @@ import calendar
 import json
 import re
 import time
+from pymongo import *
+from bson.binary import Binary
 from time import gmtime, strftime
 from whoosh.analysis import RegexTokenizer
 from whoosh.analysis import LowercaseFilter
@@ -73,8 +75,8 @@ class Tweetils(object):
                              "longitude" : lon}
 	timestamp = time.strptime(json_object['created_at'], 
                                       '%a %b %d %H:%M:%S +0000 %Y')
-	response['when'] = {'date': 'NumberLong("' + str(calendar.timegm(timestamp)) + '")', 
-                        'shardtime': 'NumberLong("' + str(calendar.timegm(timestamp)) + '")' }
+	response['when'] = {'date': calendar.timegm(timestamp) * 1000, 
+                        'shardtime': calendar.timegm(timestamp) * 1000}
 	response['who'] = {'id': json_object['user']['id'], 
 	                   'screen_name': json_object['user']['screen_name'],
 	                   'description': json_object['user']['description'],
