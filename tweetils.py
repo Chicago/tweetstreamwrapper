@@ -67,7 +67,8 @@ class Tweetils(object):
                             'tag': self.user_info['tag'],
 	                    'retweet_count': json_object['retweet_count'],
 	                    'followers_count': json_object['user']['followers_count'],
-	                    'hashtags': json_object['entities']['hashtags']}
+	                    'hashtags': json_object['entities']['hashtags'],
+                        'id': json_object['id_str']}
 	lat = json_object['coordinates']['coordinates'][1]
 	lon = json_object['coordinates']['coordinates'][0]
 	response['where'] = {'location': [lat, lon],

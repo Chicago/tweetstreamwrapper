@@ -37,11 +37,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual("unsuccess", what["hashtags"][0]["text"])
         self.assertEqual([ "talk", "about", "weather" ], what['tokens'])
         self.assertEqual("Chicago", what["tag"])
+        self.assertEqual('170009469021982720', what['id'])
         where = response['where']
         self.assertEqual(40.0075, where["location"][0])
         self.assertEqual(-89.82472222, where["location"][1])
-        self.assertEqual('NumberLong("1329368390")', response["when"]["shardtime"])
-        self.assertEqual('NumberLong("1329368390")', response["when"]["date"])
+        self.assertEqual(1329368390000, response["when"]["shardtime"])
+        self.assertEqual(1329368390000, response["when"]["date"])
         who = response['who']
         self.assertEqual(165964121, who["id"])
         self.assertEqual("WoodlandLakesWS", who["screen_name"])
